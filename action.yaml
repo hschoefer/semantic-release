@@ -1,0 +1,86 @@
+name: 'semantic-release'
+description: 'Configures and execute semantic-release'
+
+inputs:
+  step:
+    description: |
+      Options:
+        - prepare
+        - release
+    default: "prepare"
+    required: false
+  working-directory:
+    description: |
+      Working directory to checkout semantic-release files.
+    default: ${{ github.workspace }}/.semantic-release
+    required: false
+  assets:
+    description: |
+      Comma separated list of assets to commit with release.
+    default: "CHANGELOG.md"
+    required: false
+  debug:
+    description: |
+      Activates semantic-release debug log
+    default: "false"
+    required: false
+  default-branch:
+    description: |
+      Default branch of project.
+    default: "main"
+    required: false
+  dev-version-schema:
+    description: |
+      Defines development version schema to fit to artifact version rules.
+      Options:
+        - generic
+        - npm
+        - python
+      
+      # generic
+      - Connects version with postfix by "+".
+      - Replaces "/", "_", "@" in branch name with "-".
+      - Example: v1.2.3+feat-version-numbers
+      
+      # npm
+      - Connects version with postfix by "-".
+      - Replaces "/", "_", "@" in branch name with "".
+      - Example: v1.2.3-3-feat-version-numbers
+      
+      # python
+      - Connects version with postfix by ".".
+      - Replaces "/", "_", "@" in branch name with "".
+      - Doesn't use branch name.
+      - Example v1.2.3.3dev20240423113359
+    default: generic
+    required: false
+
+outputs:
+  version:
+    description: |
+      Actual version for branch.
+      Empty if no releasable state exists.
+  version-file:
+    description: |
+      File path to file with actual version for branch.
+      Empty if no releasable state exists.
+  release-version:
+    description: |
+      Next release version.
+      Empty if no releasable state exists.
+  release-version-file:
+    description: |
+      File path to file with next release version.
+      Empty if no releasable state exists.
+  dev-version:
+    description: |
+      Next release version.
+      Empty if no releasable state exists.
+  dev-version-file:
+    description: |
+      File path to file with next release version. 
+      Empty if no releasable state exists.
+
+runs:
+  using: node20
+  main: dist/main/index.js
