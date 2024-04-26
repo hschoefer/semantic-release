@@ -19,10 +19,19 @@ jobs:
         with:
           ssh-key: ${{ secrets.release_ssh_key }}
 
-      - name: build dist files
+      - name: npm install
         shell: bash
         run: |
           npm install
+
+      - name: lint
+        shell: bash
+        run: |
+          npm install
+
+      - name: build dist files
+        shell: bash
+        run: |
           npm run build
 
       - name: semantic-release - prepare

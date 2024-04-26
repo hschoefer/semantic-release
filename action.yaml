@@ -2,34 +2,23 @@ name: 'semantic-release'
 description: 'Configures and execute semantic-release'
 
 inputs:
-  step:
-    description: |
-      Options:
-        - prepare
-        - release
-    default: "prepare"
-    required: false
-  working-directory:
-    description: |
-      Working directory to checkout semantic-release files.
-    default: ${{ github.workspace }}/.semantic-release
-    required: false
   assets:
+    default: "CHANGELOG.md"
     description: |
       Comma separated list of assets to commit with release.
-    default: "CHANGELOG.md"
     required: false
   debug:
+    default: "false"
     description: |
       Activates semantic-release debug log
-    default: "false"
     required: false
   default-branch:
+    default: "main"
     description: |
       Default branch of project.
-    default: "main"
     required: false
   dev-version-schema:
+    default: generic
     description: |
       Defines development version schema to fit to artifact version rules.
       Options:
@@ -52,7 +41,25 @@ inputs:
       - Replaces "/", "_", "@" in branch name with "".
       - Doesn't use branch name.
       - Example v1.2.3.3dev20240423113359
-    default: generic
+    required: false
+  package-name:
+    default: ""
+    description: |
+      `package-name` is used when creating git tag with `@semantic-release/git`.
+      If empty no prefix will be set.
+      Supports mono repository usage.
+    required: false
+  step:
+    default: "prepare"
+    description: |
+      Options:
+        - prepare
+        - release
+    required: false
+  working-directory:
+    default: ${{ github.workspace }}/.semantic-release
+    description: |
+      Working directory to checkout semantic-release files.
     required: false
 
 outputs:

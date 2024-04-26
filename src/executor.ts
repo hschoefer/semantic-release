@@ -39,12 +39,12 @@ export class Executor {
         const branchName = await this.gitBranch()
 
         let versionReplaced = branchName
-          .replace(/[\/_@]/g, '.')
+          .replace(/[/_@]/g, '.')
         if ("python" == versionScheme) {
             versionReplaced = `${dayjs().format('YYYYMMDDHHmmss')}`
         }
 
-        let formattedShortened = versionReplaced.substring(0, 40);
+        const formattedShortened = versionReplaced.substring(0, 40);
         core.debug(`Formatted branch name: ${formattedShortened}`)
 
         let prefix = "+"
@@ -114,7 +114,7 @@ export class Executor {
         return result
     }
 
-    async executeSemanticRelease(workingDirectory: string, debug: boolean, assets: string, branchName: string, branchNameProcessed: string, versionConnector: string, dryRun: boolean) {
+    async executeSemanticRelease(workingDirectory: string, debug: boolean, assets: string, tagPattern: string, branchName: string, branchNameProcessed: string, versionConnector: string, dryRun: boolean) {
         const config = path.join(workingDirectory, 'release.config.js');
 
         let parameters = [path.join(workingDirectory, "/node_modules/.bin/semantic-release"), "--extends", config]
@@ -126,6 +126,7 @@ export class Executor {
                 ...process.env,
                 ASSETS: assets,
                 WORKING_DIRECTORY: workingDirectory,
+                TAG_PATTERN: tagPattern,
                 BRANCH_NAME_PLAIN: branchName,
                 BRANCH_NAME_PROCESSED: branchNameProcessed,
                 VERSION_CONNECTOR: versionConnector,
@@ -134,12 +135,12 @@ export class Executor {
         await this.exec("npx", parameters, options);
     }
 
-    async executeDryRun(workingDirectory: string, debug: boolean, assets: string, branchName: string, branchNameProcessed: string, versionConnector: string) {
-        await this.executeSemanticRelease(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector, true);
+    async executeDryRun(workingDirectory: string, debug: boolean, assets: string, tagPattern: string, branchName: string, branchNameProcessed: string, versionConnector: string) {
+        await this.executeSemanticRelease(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector, true);
     }
 
-    async executeRelease(workingDirectory: string, debug: boolean, assets: string, branchName: string, branchNameProcessed: string, versionConnector: string) {
-        await this.executeSemanticRelease(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector, false);
+    async executeRelease(workingDirectory: string, debug: boolean, assets: string, tagPattern: string, branchName: string, branchNameProcessed: string, versionConnector: string) {
+        await this.executeSemanticRelease(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector, false);
     }
 
     async writeOutputs(workingDirectory: string, defaultBranch: string, branchName: string) {
