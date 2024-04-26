@@ -4,7 +4,6 @@ import {ExecOptions} from '@actions/exec'
 import * as io from '@actions/io'
 import path from "node:path";
 import fs from 'fs';
-import dayjs from "dayjs";
 
 export class Executor {
     async cat() {
@@ -17,41 +16,10 @@ export class Executor {
         return this.exec("ls", ["-la", this.buildActionDirectoryPath()])
     }
 
-    async buildVersionConnector(versionScheme: string) {
-        let versionConnector = "+"
-        if ("python" == versionScheme) {
-            versionConnector = "."
-        }
-        if ("npm" == versionScheme) {
-            versionConnector = "-"
-        }
-
-        return versionConnector
-    }
-
     async gitBranch() {
         const branchNameCommandResult = await this.exec('git', ['rev-parse', '--abbrev-ref', 'HEAD'])
         core.debug(`Branch name: ${branchNameCommandResult}`)
         return branchNameCommandResult.stdout.trim()
-    }
-
-    async gitBranchFormatted(versionScheme: string) {
-        const branchName = await this.gitBranch()
-
-        let versionReplaced = branchName
-          .replace(/[/_@]/g, '.')
-        if ("python" == versionScheme) {
-            versionReplaced = `${dayjs().format('YYYYMMDDHHmmss')}`
-        }
-
-        const formattedShortened = versionReplaced.substring(0, 40);
-        core.debug(`Formatted branch name: ${formattedShortened}`)
-
-        let prefix = "+"
-        if ("python" == versionScheme) {
-            prefix = "dev"
-        }
-        return `${prefix}${formattedShortened}`
     }
 
     async prepareSemanticReleaseWorkingDirectory(workingDirectory: string) {

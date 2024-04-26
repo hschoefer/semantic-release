@@ -21,12 +21,12 @@ async function run(): Promise<void> {
   const executor = new Executor()
   try {
     const branchName = await executor.gitBranch()
+
     const branchNameProcessed = devVersionGenerator.generatePostfix(branchName, developmentVersionSchema)
+    const versionConnector = await devVersionGenerator.generateConnector(developmentVersionSchema)
 
     await executor.prepareSemanticReleaseWorkingDirectory(workingDirectory)
     await executor.npmInstall(workingDirectory)
-
-    const versionConnector = await executor.buildVersionConnector(developmentVersionSchema)
 
     const tagPattern = new TagPatternBuilder().build(packageName)
 
@@ -38,7 +38,7 @@ async function run(): Promise<void> {
       await executor.executeRelease(workingDirectory, debugFlag, assets, tagPattern, branchName, branchNameProcessed, versionConnector)
     }
 
-    /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   } catch (error: any) {
     core.setFailed(error.message)
   }

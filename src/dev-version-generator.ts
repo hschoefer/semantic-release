@@ -24,6 +24,14 @@ export class DevVersionGenerator {
   }
 
   generateConnector(schema: string): string {
-    return schema
+    let versionConnector = "+"
+    if ("python" == schema) {
+      versionConnector = "."
+    }
+    if ("npm" == schema) {
+      versionConnector = "-"
+    }
+
+    return versionConnector
   }
 }

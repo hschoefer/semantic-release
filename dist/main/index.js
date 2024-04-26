@@ -26228,7 +26228,14 @@ class DevVersionGenerator {
         return `${prefix}${formattedShortened}`;
     }
     generateConnector(schema) {
-        return schema;
+        let versionConnector = "+";
+        if ("python" == schema) {
+            versionConnector = ".";
+        }
+        if ("npm" == schema) {
+            versionConnector = "-";
+        }
+        return versionConnector;
     }
 }
 exports.DevVersionGenerator = DevVersionGenerator;
@@ -26283,7 +26290,6 @@ const exec = __importStar(__nccwpck_require__(1514));
 const io = __importStar(__nccwpck_require__(7436));
 const node_path_1 = __importDefault(__nccwpck_require__(9411));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
-const dayjs_1 = __importDefault(__nccwpck_require__(7401));
 class Executor {
     cat() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -26296,40 +26302,11 @@ class Executor {
             return this.exec("ls", ["-la", this.buildActionDirectoryPath()]);
         });
     }
-    buildVersionConnector(versionScheme) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let versionConnector = "+";
-            if ("python" == versionScheme) {
-                versionConnector = ".";
-            }
-            if ("npm" == versionScheme) {
-                versionConnector = "-";
-            }
-            return versionConnector;
-        });
-    }
     gitBranch() {
         return __awaiter(this, void 0, void 0, function* () {
             const branchNameCommandResult = yield this.exec('git', ['rev-parse', '--abbrev-ref', 'HEAD']);
             core.debug(`Branch name: ${branchNameCommandResult}`);
             return branchNameCommandResult.stdout.trim();
-        });
-    }
-    gitBranchFormatted(versionScheme) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const branchName = yield this.gitBranch();
-            let versionReplaced = branchName
-                .replace(/[/_@]/g, '.');
-            if ("python" == versionScheme) {
-                versionReplaced = `${(0, dayjs_1.default)().format('YYYYMMDDHHmmss')}`;
-            }
-            const formattedShortened = versionReplaced.substring(0, 40);
-            core.debug(`Formatted branch name: ${formattedShortened}`);
-            let prefix = "+";
-            if ("python" == versionScheme) {
-                prefix = "dev";
-            }
-            return `${prefix}${formattedShortened}`;
         });
     }
     prepareSemanticReleaseWorkingDirectory(workingDirectory) {
@@ -26498,9 +26475,9 @@ function run() {
         try {
             const branchName = yield executor.gitBranch();
             const branchNameProcessed = devVersionGenerator.generatePostfix(branchName, developmentVersionSchema);
+            const versionConnector = yield devVersionGenerator.generateConnector(developmentVersionSchema);
             yield executor.prepareSemanticReleaseWorkingDirectory(workingDirectory);
             yield executor.npmInstall(workingDirectory);
-            const versionConnector = yield executor.buildVersionConnector(developmentVersionSchema);
             const tagPattern = new tag_pattern_builder_1.TagPatternBuilder().build(packageName);
             if ('prepare' == step) {
                 core.info("Execute prepare step.");

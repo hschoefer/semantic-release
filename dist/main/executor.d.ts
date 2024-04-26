@@ -2,9 +2,7 @@ import { ExecOptions } from '@actions/exec';
 export declare class Executor {
     cat(): Promise<ExecResult>;
     lsActionDirectory(): Promise<ExecResult>;
-    buildVersionConnector(versionScheme: string): Promise<string>;
     gitBranch(): Promise<string>;
-    gitBranchFormatted(versionScheme: string): Promise<string>;
     prepareSemanticReleaseWorkingDirectory(workingDirectory: string): Promise<void>;
     npmInstall(workingDirectory: string): Promise<void>;
     pwd(): Promise<ExecResult>;

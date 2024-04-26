@@ -7,36 +7,95 @@ describe('DevVersionPostfixGenerator', () => {
 
   const branchName = "feat/mono-repo"
 
-  test('generate generic', () => {
-    // given
-    const schema = ""
+  describe("generatePostfix", () => {
+    test('for unset', () => {
+      // given
+      const schema = ""
 
-    // when
-    const actual = unitUnderTest.generatePostfix(branchName, schema)
+      // when
+      const actual = unitUnderTest.generatePostfix(branchName, schema)
 
-    // then
-    expect(actual).toBe("-feat-mono-repo");
+      // then
+      expect(actual).toBe("-feat-mono-repo");
+    })
+
+    test('for generic', () => {
+      // given
+      const schema = "generic"
+
+      // when
+      const actual = unitUnderTest.generatePostfix(branchName, schema)
+
+      // then
+      expect(actual).toBe("-feat-mono-repo");
+    })
+
+    test('for npm', () => {
+      // given
+      const schema = "npm"
+
+      // when
+      const actual = unitUnderTest.generatePostfix(branchName, schema)
+
+      // then
+      expect(actual).toBe("-feat-mono-repo");
+    })
+
+    test('for python', () => {
+      // given
+      const schema = "python"
+
+      // when
+      const actual = unitUnderTest.generatePostfix(branchName, schema)
+
+      // then
+      expect(actual).toBe("dev20240426152947");
+    })
   })
 
-  test('generate npm', () => {
-    // given
-    const schema = ""
+  describe("generateConnector", () => {
+    test('for unset', () => {
+      // given
+      const schema = ""
 
-    // when
-    const actual = unitUnderTest.generatePostfix(branchName, schema)
+      // when
+      const actual = unitUnderTest.generateConnector(schema)
 
-    // then
-    expect(actual).toBe("-feat-mono-repo");
-  })
+      // then
+      expect(actual).toBe("+");
+    })
 
-  test('generate python', () => {
-    // given
-    const schema = "python"
+    test('for generic', () => {
+      // given
+      const schema = "generic"
 
-    // when
-    const actual = unitUnderTest.generatePostfix(branchName, schema)
+      // when
+      const actual = unitUnderTest.generateConnector(schema)
 
-    // then
-    expect(actual).toBe("dev20240426152947");
+      // then
+      expect(actual).toBe("+");
+    })
+
+    test('for npm', () => {
+      // given
+      const schema = "npm"
+
+      // when
+      const actual = unitUnderTest.generateConnector(schema)
+
+      // then
+      expect(actual).toBe("-");
+    })
+
+    test('for python', () => {
+      // given
+      const schema = "python"
+
+      // when
+      const actual = unitUnderTest.generateConnector(schema)
+
+      // then
+      expect(actual).toBe(".");
+    })
   })
 })
