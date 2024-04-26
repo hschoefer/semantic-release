@@ -54,6 +54,11 @@ jobs:
           echo "dev-Version file path: ${{ steps.semantic-release.outputs.dev-version-file }}"
           echo "dev-Version file content: $(cat ${{ steps.semantic-release.outputs.dev-version-file }})"
 
+      - name: Update project version
+        shell: bash
+        run: |
+          npm version ${{ steps.semantic-release.outputs.version }}
+
       - name: semantic-release - release
         uses: ./
         if: ${{ github.ref == format('{0}/{1}','refs/heads',github.event.repository.default_branch) }}
