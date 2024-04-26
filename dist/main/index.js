@@ -26154,6 +26154,95 @@ module.exports = {
 
 /***/ }),
 
+/***/ 4979:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DayjsTimestampGenerator = void 0;
+const dayjs_1 = __importDefault(__nccwpck_require__(7401));
+class DayjsTimestampGenerator {
+    generate(pattern) {
+        if (undefined == pattern) {
+            return `${(0, dayjs_1.default)().format()}`;
+        }
+        return `${(0, dayjs_1.default)().format(pattern)}`;
+    }
+}
+exports.DayjsTimestampGenerator = DayjsTimestampGenerator;
+
+
+/***/ }),
+
+/***/ 8241:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DevVersionGenerator = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+class DevVersionGenerator {
+    constructor(timestampGenerator) {
+        this.timestampGenerator = timestampGenerator;
+    }
+    generatePostfix(branchName, schema) {
+        let versionReplaced = branchName
+            .replace(/[/_@]/g, '-');
+        if ("python" == schema) {
+            versionReplaced = `${this.timestampGenerator.generate('YYYYMMDDHHmmss')}`;
+        }
+        const formattedShortened = versionReplaced.substring(0, 40);
+        core.debug(`Formatted branch name: ${formattedShortened}`);
+        let prefix = "-";
+        if ("python" == schema) {
+            prefix = "dev";
+        }
+        return `${prefix}${formattedShortened}`;
+    }
+    generateConnector(schema) {
+        let versionConnector = "+";
+        if ("python" == schema) {
+            versionConnector = ".";
+        }
+        if ("npm" == schema) {
+            versionConnector = "-";
+        }
+        return versionConnector;
+    }
+}
+exports.DevVersionGenerator = DevVersionGenerator;
+
+
+/***/ }),
+
 /***/ 2384:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -26201,7 +26290,6 @@ const exec = __importStar(__nccwpck_require__(1514));
 const io = __importStar(__nccwpck_require__(7436));
 const node_path_1 = __importDefault(__nccwpck_require__(9411));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
-const dayjs_1 = __importDefault(__nccwpck_require__(7401));
 class Executor {
     cat() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -26214,40 +26302,11 @@ class Executor {
             return this.exec("ls", ["-la", this.buildActionDirectoryPath()]);
         });
     }
-    buildVersionConnector(versionScheme) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let versionConnector = "+";
-            if ("python" == versionScheme) {
-                versionConnector = ".";
-            }
-            if ("npm" == versionScheme) {
-                versionConnector = "-";
-            }
-            return versionConnector;
-        });
-    }
     gitBranch() {
         return __awaiter(this, void 0, void 0, function* () {
             const branchNameCommandResult = yield this.exec('git', ['rev-parse', '--abbrev-ref', 'HEAD']);
             core.debug(`Branch name: ${branchNameCommandResult}`);
             return branchNameCommandResult.stdout.trim();
-        });
-    }
-    gitBranchFormatted(versionScheme) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const branchName = yield this.gitBranch();
-            let versionReplaced = branchName
-                .replace(/[\/_@]/g, '.');
-            if ("python" == versionScheme) {
-                versionReplaced = `${(0, dayjs_1.default)().format('YYYYMMDDHHmmss')}`;
-            }
-            let formattedShortened = versionReplaced.substring(0, 40);
-            core.debug(`Formatted branch name: ${formattedShortened}`);
-            let prefix = "+";
-            if ("python" == versionScheme) {
-                prefix = "dev";
-            }
-            return `${prefix}${formattedShortened}`;
         });
     }
     prepareSemanticReleaseWorkingDirectory(workingDirectory) {
@@ -26306,26 +26365,26 @@ class Executor {
             return result;
         });
     }
-    executeSemanticRelease(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector, dryRun) {
+    executeSemanticRelease(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector, dryRun) {
         return __awaiter(this, void 0, void 0, function* () {
             const config = node_path_1.default.join(workingDirectory, 'release.config.js');
             let parameters = [node_path_1.default.join(workingDirectory, "/node_modules/.bin/semantic-release"), "--extends", config];
             parameters = debug ? [...parameters, "--debug"] : parameters;
             parameters = dryRun ? [...parameters, "--dry-run"] : parameters;
             const options = {
-                env: Object.assign(Object.assign({}, process.env), { ASSETS: assets, WORKING_DIRECTORY: workingDirectory, BRANCH_NAME_PLAIN: branchName, BRANCH_NAME_PROCESSED: branchNameProcessed, VERSION_CONNECTOR: versionConnector })
+                env: Object.assign(Object.assign({}, process.env), { ASSETS: assets, WORKING_DIRECTORY: workingDirectory, TAG_PATTERN: tagPattern, BRANCH_NAME_PLAIN: branchName, BRANCH_NAME_PROCESSED: branchNameProcessed, VERSION_CONNECTOR: versionConnector })
             };
             yield this.exec("npx", parameters, options);
         });
     }
-    executeDryRun(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector) {
+    executeDryRun(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.executeSemanticRelease(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector, true);
+            yield this.executeSemanticRelease(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector, true);
         });
     }
-    executeRelease(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector) {
+    executeRelease(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.executeSemanticRelease(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector, false);
+            yield this.executeSemanticRelease(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector, false);
         });
     }
     writeOutputs(workingDirectory, defaultBranch, branchName) {
@@ -26398,29 +26457,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const executor_1 = __nccwpck_require__(2384);
+const tag_pattern_builder_1 = __nccwpck_require__(5829);
+const dev_version_generator_1 = __nccwpck_require__(8241);
+const dayjs_timestamp_generator_1 = __nccwpck_require__(4979);
+const timestampGenerator = new dayjs_timestamp_generator_1.DayjsTimestampGenerator();
+const devVersionGenerator = new dev_version_generator_1.DevVersionGenerator(timestampGenerator);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const workingDirectory = core.getInput('working-directory');
         const assets = core.getInput('assets');
         const debugFlag = core.getInput('debug') === "true";
-        const step = core.getInput('step');
         const defaultBranch = core.getInput('default-branch');
         const developmentVersionSchema = core.getInput('dev-version-schema');
+        const packageName = core.getInput('package-name');
+        const step = core.getInput('step');
+        const workingDirectory = core.getInput('working-directory');
         const executor = new executor_1.Executor();
         try {
             const branchName = yield executor.gitBranch();
-            const branchNameProcessed = yield executor.gitBranchFormatted(developmentVersionSchema);
+            const branchNameProcessed = devVersionGenerator.generatePostfix(branchName, developmentVersionSchema);
+            const versionConnector = yield devVersionGenerator.generateConnector(developmentVersionSchema);
             yield executor.prepareSemanticReleaseWorkingDirectory(workingDirectory);
             yield executor.npmInstall(workingDirectory);
-            const versionConnector = yield executor.buildVersionConnector(developmentVersionSchema);
+            const tagPattern = new tag_pattern_builder_1.TagPatternBuilder().build(packageName);
             if ('prepare' == step) {
                 core.info("Execute prepare step.");
-                yield executor.executeDryRun(workingDirectory, debugFlag, assets, branchName, branchNameProcessed, versionConnector);
+                yield executor.executeDryRun(workingDirectory, debugFlag, assets, tagPattern, branchName, branchNameProcessed, versionConnector);
                 yield executor.writeOutputs(workingDirectory, defaultBranch, branchName);
             }
             else {
-                yield executor.executeRelease(workingDirectory, debugFlag, assets, branchName, branchNameProcessed, versionConnector);
+                yield executor.executeRelease(workingDirectory, debugFlag, assets, tagPattern, branchName, branchNameProcessed, versionConnector);
             }
+            /* eslint-disable @typescript-eslint/no-explicit-any */
         }
         catch (error) {
             core.setFailed(error.message);
@@ -26428,6 +26495,27 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 5829:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TagPatternBuilder = void 0;
+class TagPatternBuilder {
+    build(packageName) {
+        let prefix = "";
+        if ("" != packageName) {
+            prefix = `${packageName}-`;
+        }
+        return `${prefix}v\${version}`;
+    }
+}
+exports.TagPatternBuilder = TagPatternBuilder;
 
 
 /***/ }),

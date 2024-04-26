@@ -19,10 +19,19 @@ jobs:
         with:
           ssh-key: ${{ secrets.release_ssh_key }}
 
-      - name: build dist files
+      - name: npm install
         shell: bash
         run: |
           npm install
+
+      - name: lint
+        shell: bash
+        run: |
+          npm run lint
+
+      - name: build dist files
+        shell: bash
+        run: |
           npm run build
 
       - name: semantic-release - prepare
@@ -30,6 +39,7 @@ jobs:
         id: semantic-release
         with:
           step: prepare
+          dev-version-schema: npm
           debug: true
 
       - name: Print version outputs
@@ -45,10 +55,16 @@ jobs:
           echo "dev-Version file path: ${{ steps.semantic-release.outputs.dev-version-file }}"
           echo "dev-Version file content: $(cat ${{ steps.semantic-release.outputs.dev-version-file }})"
 
+      - name: Update project version
+        shell: bash
+        run: |
+          npm version --no-git-tag-version ${{ steps.semantic-release.outputs.version }}
+
       - name: semantic-release - release
         uses: ./
         if: ${{ github.ref == format('{0}/{1}','refs/heads',github.event.repository.default_branch) }}
         with:
           step: release
-          assets: "CHANGELOG.md,dist/**/*"
+          assets: "CHANGELOG.md,package.json,package-lock.json,dist/**/*"
+          dev-version-schema: npm
           debug: true

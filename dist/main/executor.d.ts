@@ -2,9 +2,7 @@ import { ExecOptions } from '@actions/exec';
 export declare class Executor {
     cat(): Promise<ExecResult>;
     lsActionDirectory(): Promise<ExecResult>;
-    buildVersionConnector(versionScheme: string): Promise<string>;
     gitBranch(): Promise<string>;
-    gitBranchFormatted(versionScheme: string): Promise<string>;
     prepareSemanticReleaseWorkingDirectory(workingDirectory: string): Promise<void>;
     npmInstall(workingDirectory: string): Promise<void>;
     pwd(): Promise<ExecResult>;
@@ -12,9 +10,9 @@ export declare class Executor {
     ls(path: string): Promise<ExecResult>;
     private buildSemanticReleasePath;
     exec(tool: string, args: string[], options?: ExecOptions): Promise<ExecResult>;
-    executeSemanticRelease(workingDirectory: string, debug: boolean, assets: string, branchName: string, branchNameProcessed: string, versionConnector: string, dryRun: boolean): Promise<void>;
-    executeDryRun(workingDirectory: string, debug: boolean, assets: string, branchName: string, branchNameProcessed: string, versionConnector: string): Promise<void>;
-    executeRelease(workingDirectory: string, debug: boolean, assets: string, branchName: string, branchNameProcessed: string, versionConnector: string): Promise<void>;
+    executeSemanticRelease(workingDirectory: string, debug: boolean, assets: string, tagPattern: string, branchName: string, branchNameProcessed: string, versionConnector: string, dryRun: boolean): Promise<void>;
+    executeDryRun(workingDirectory: string, debug: boolean, assets: string, tagPattern: string, branchName: string, branchNameProcessed: string, versionConnector: string): Promise<void>;
+    executeRelease(workingDirectory: string, debug: boolean, assets: string, tagPattern: string, branchName: string, branchNameProcessed: string, versionConnector: string): Promise<void>;
     writeOutputs(workingDirectory: string, defaultBranch: string, branchName: string): Promise<void>;
 }
 export interface ExecResult {

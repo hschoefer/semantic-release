@@ -1,10 +1,10 @@
-
-
 .idea/
 *.iml
 *.iws
 *.ipr
 out/
+
+lib
 
 # Logs
 logs
