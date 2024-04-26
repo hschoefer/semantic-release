@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/hschoefer/semantic-release/compare/v1.0.1...v1.1.0) (2024-04-26)
+
+
+### Features
+
+* allow custom tag pattern to support mono repo ([e6388d1](https://github.com/hschoefer/semantic-release/commit/e6388d1750c5283e93c3532c31cc437e1dac5493))
+
 ## [1.0.1](https://github.com/hschoefer/semantic-release/compare/v1.0.0...v1.0.1) (2024-04-26)
 
 # 1.0.0 (2024-04-26)
