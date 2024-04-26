@@ -16,6 +16,7 @@
   "exclude": [
     "**/*.test.ts",
     "**/*.mock.ts",
+    "**/*.config.ts",
     "lib",
     "node_modules"
   ]

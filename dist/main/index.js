@@ -26154,6 +26154,88 @@ module.exports = {
 
 /***/ }),
 
+/***/ 4979:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DayjsTimestampGenerator = void 0;
+const dayjs_1 = __importDefault(__nccwpck_require__(7401));
+class DayjsTimestampGenerator {
+    generate(pattern) {
+        if (undefined == pattern) {
+            return `${(0, dayjs_1.default)().format()}`;
+        }
+        return `${(0, dayjs_1.default)().format(pattern)}`;
+    }
+}
+exports.DayjsTimestampGenerator = DayjsTimestampGenerator;
+
+
+/***/ }),
+
+/***/ 8241:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DevVersionGenerator = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+class DevVersionGenerator {
+    constructor(timestampGenerator) {
+        this.timestampGenerator = timestampGenerator;
+    }
+    generatePostfix(branchName, schema) {
+        let versionReplaced = branchName
+            .replace(/[/_@]/g, '-');
+        if ("python" == schema) {
+            versionReplaced = `${this.timestampGenerator.generate('YYYYMMDDHHmmss')}`;
+        }
+        const formattedShortened = versionReplaced.substring(0, 40);
+        core.debug(`Formatted branch name: ${formattedShortened}`);
+        let prefix = "-";
+        if ("python" == schema) {
+            prefix = "dev";
+        }
+        return `${prefix}${formattedShortened}`;
+    }
+    generateConnector(schema) {
+        return schema;
+    }
+}
+exports.DevVersionGenerator = DevVersionGenerator;
+
+
+/***/ }),
+
 /***/ 2384:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -26399,6 +26481,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const executor_1 = __nccwpck_require__(2384);
 const tag_pattern_builder_1 = __nccwpck_require__(5829);
+const dev_version_generator_1 = __nccwpck_require__(8241);
+const dayjs_timestamp_generator_1 = __nccwpck_require__(4979);
+const timestampGenerator = new dayjs_timestamp_generator_1.DayjsTimestampGenerator();
+const devVersionGenerator = new dev_version_generator_1.DevVersionGenerator(timestampGenerator);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const assets = core.getInput('assets');
@@ -26411,7 +26497,7 @@ function run() {
         const executor = new executor_1.Executor();
         try {
             const branchName = yield executor.gitBranch();
-            const branchNameProcessed = yield executor.gitBranchFormatted(developmentVersionSchema);
+            const branchNameProcessed = devVersionGenerator.generatePostfix(branchName, developmentVersionSchema);
             yield executor.prepareSemanticReleaseWorkingDirectory(workingDirectory);
             yield executor.npmInstall(workingDirectory);
             const versionConnector = yield executor.buildVersionConnector(developmentVersionSchema);
