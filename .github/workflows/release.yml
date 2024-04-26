@@ -27,7 +27,7 @@ jobs:
       - name: lint
         shell: bash
         run: |
-          npm install
+          npm run lint
 
       - name: build dist files
         shell: bash
