@@ -16,6 +16,8 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.release_ssh_key }}
 
       - name: build dist files
         shell: bash
