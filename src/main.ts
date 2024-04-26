@@ -1,6 +1,13 @@
 import * as core from '@actions/core'
 import {Executor} from "./executor";
 import {TagPatternBuilder} from "./tag-pattern-builder";
+import {DevVersionGenerator} from "./dev-version-generator";
+import {DayjsTimestampGenerator} from "./dayjs-timestamp-generator";
+
+const timestampGenerator = new DayjsTimestampGenerator()
+const devVersionGenerator = new DevVersionGenerator(
+  timestampGenerator,
+)
 
 async function run(): Promise<void> {
   const assets: string = core.getInput('assets')
@@ -14,7 +21,7 @@ async function run(): Promise<void> {
   const executor = new Executor()
   try {
     const branchName = await executor.gitBranch()
-    const branchNameProcessed = await executor.gitBranchFormatted(developmentVersionSchema)
+    const branchNameProcessed = devVersionGenerator.generatePostfix(branchName, developmentVersionSchema)
 
     await executor.prepareSemanticReleaseWorkingDirectory(workingDirectory)
     await executor.npmInstall(workingDirectory)

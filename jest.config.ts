@@ -1,4 +1,6 @@
-module.exports = {
+import type {Config} from 'jest';
+
+const config: Config = {
   clearMocks: true,
   moduleFileExtensions: ['js', 'ts'],
   testEnvironment: 'node',
@@ -9,4 +11,6 @@ module.exports = {
   },
   verbose: true,
   collectCoverage: true
-};
+}
+
+export default config

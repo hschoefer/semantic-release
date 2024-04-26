@@ -1,4 +1,4 @@
-import {TagPatternBuilder} from "../src/tag-pattern-builder";
+import {TagPatternBuilder} from "./tag-pattern-builder";
 
 describe('TagPatternBuilder', () => {
     const unitUnderTest = new TagPatternBuilder()

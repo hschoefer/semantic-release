@@ -27,18 +27,19 @@ inputs:
         - python
       
       # generic
+      - Uses SemVer 2.0.0 with build postfix.
       - Connects version with postfix by "+".
       - Replaces "/", "_", "@" in branch name with "-".
       - Example: v1.2.3+feat-version-numbers
       
       # npm
-      - Connects version with postfix by "-".
-      - Replaces "/", "_", "@" in branch name with "".
+      - Uses SemVer 2.0.0 with pre-release postfix. npm doesn't support SemVer 2.0 version with build postfix.
+      - Replaces "/", "_", "@" in branch name with "-".
       - Example: v1.2.3-3-feat-version-numbers
       
       # python
+      - Uses dev postfix with additional timestamp. Python doesn't support SemVer 2.0.0 postfixes.
       - Connects version with postfix by ".".
-      - Replaces "/", "_", "@" in branch name with "".
       - Doesn't use branch name.
       - Example v1.2.3.3dev20240423113359
     required: false

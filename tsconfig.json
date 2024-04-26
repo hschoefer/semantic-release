@@ -13,5 +13,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true
   },
-  "exclude": ["__tests__", "lib", "node_modules"]
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.mock.ts",
+    "lib",
+    "node_modules"
+  ]
 }

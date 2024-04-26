@@ -26237,11 +26237,11 @@ class Executor {
         return __awaiter(this, void 0, void 0, function* () {
             const branchName = yield this.gitBranch();
             let versionReplaced = branchName
-                .replace(/[\/_@]/g, '.');
+                .replace(/[/_@]/g, '.');
             if ("python" == versionScheme) {
                 versionReplaced = `${(0, dayjs_1.default)().format('YYYYMMDDHHmmss')}`;
             }
-            let formattedShortened = versionReplaced.substring(0, 40);
+            const formattedShortened = versionReplaced.substring(0, 40);
             core.debug(`Formatted branch name: ${formattedShortened}`);
             let prefix = "+";
             if ("python" == versionScheme) {
@@ -26306,26 +26306,26 @@ class Executor {
             return result;
         });
     }
-    executeSemanticRelease(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector, dryRun) {
+    executeSemanticRelease(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector, dryRun) {
         return __awaiter(this, void 0, void 0, function* () {
             const config = node_path_1.default.join(workingDirectory, 'release.config.js');
             let parameters = [node_path_1.default.join(workingDirectory, "/node_modules/.bin/semantic-release"), "--extends", config];
             parameters = debug ? [...parameters, "--debug"] : parameters;
             parameters = dryRun ? [...parameters, "--dry-run"] : parameters;
             const options = {
-                env: Object.assign(Object.assign({}, process.env), { ASSETS: assets, WORKING_DIRECTORY: workingDirectory, BRANCH_NAME_PLAIN: branchName, BRANCH_NAME_PROCESSED: branchNameProcessed, VERSION_CONNECTOR: versionConnector })
+                env: Object.assign(Object.assign({}, process.env), { ASSETS: assets, WORKING_DIRECTORY: workingDirectory, TAG_PATTERN: tagPattern, BRANCH_NAME_PLAIN: branchName, BRANCH_NAME_PROCESSED: branchNameProcessed, VERSION_CONNECTOR: versionConnector })
             };
             yield this.exec("npx", parameters, options);
         });
     }
-    executeDryRun(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector) {
+    executeDryRun(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.executeSemanticRelease(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector, true);
+            yield this.executeSemanticRelease(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector, true);
         });
     }
-    executeRelease(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector) {
+    executeRelease(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.executeSemanticRelease(workingDirectory, debug, assets, branchName, branchNameProcessed, versionConnector, false);
+            yield this.executeSemanticRelease(workingDirectory, debug, assets, tagPattern, branchName, branchNameProcessed, versionConnector, false);
         });
     }
     writeOutputs(workingDirectory, defaultBranch, branchName) {
@@ -26398,14 +26398,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const executor_1 = __nccwpck_require__(2384);
+const tag_pattern_builder_1 = __nccwpck_require__(5829);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const workingDirectory = core.getInput('working-directory');
         const assets = core.getInput('assets');
         const debugFlag = core.getInput('debug') === "true";
-        const step = core.getInput('step');
         const defaultBranch = core.getInput('default-branch');
         const developmentVersionSchema = core.getInput('dev-version-schema');
+        const packageName = core.getInput('package-name');
+        const step = core.getInput('step');
+        const workingDirectory = core.getInput('working-directory');
         const executor = new executor_1.Executor();
         try {
             const branchName = yield executor.gitBranch();
@@ -26413,14 +26415,16 @@ function run() {
             yield executor.prepareSemanticReleaseWorkingDirectory(workingDirectory);
             yield executor.npmInstall(workingDirectory);
             const versionConnector = yield executor.buildVersionConnector(developmentVersionSchema);
+            const tagPattern = new tag_pattern_builder_1.TagPatternBuilder().build(packageName);
             if ('prepare' == step) {
                 core.info("Execute prepare step.");
-                yield executor.executeDryRun(workingDirectory, debugFlag, assets, branchName, branchNameProcessed, versionConnector);
+                yield executor.executeDryRun(workingDirectory, debugFlag, assets, tagPattern, branchName, branchNameProcessed, versionConnector);
                 yield executor.writeOutputs(workingDirectory, defaultBranch, branchName);
             }
             else {
-                yield executor.executeRelease(workingDirectory, debugFlag, assets, branchName, branchNameProcessed, versionConnector);
+                yield executor.executeRelease(workingDirectory, debugFlag, assets, tagPattern, branchName, branchNameProcessed, versionConnector);
             }
+            /* eslint-disable @typescript-eslint/no-explicit-any */
         }
         catch (error) {
             core.setFailed(error.message);
@@ -26428,6 +26432,27 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 5829:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TagPatternBuilder = void 0;
+class TagPatternBuilder {
+    build(packageName) {
+        let prefix = "";
+        if ("" != packageName) {
+            prefix = `${packageName}-`;
+        }
+        return `${prefix}v\${version}`;
+    }
+}
+exports.TagPatternBuilder = TagPatternBuilder;
 
 
 /***/ }),
