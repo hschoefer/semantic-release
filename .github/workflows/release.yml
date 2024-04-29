@@ -38,9 +38,9 @@ jobs:
         uses: ./
         id: semantic-release
         with:
-          step: prepare
-          dev-version-schema: npm
           debug: true
+          dev-version-schema: npm
+          step: prepare
 
       - name: Print version outputs
         shell: bash
@@ -64,7 +64,7 @@ jobs:
         uses: ./
         if: ${{ github.ref == format('{0}/{1}','refs/heads',github.event.repository.default_branch) }}
         with:
-          step: release
           assets: "CHANGELOG.md,package.json,package-lock.json,dist/**/*"
-          dev-version-schema: npm
           debug: true
+          dev-version-schema: npm
+          step: release

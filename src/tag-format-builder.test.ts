@@ -1,7 +1,7 @@
-import {TagPatternBuilder} from "./tag-pattern-builder";
+import {TagFormatBuilder} from "./tag-format-builder";
 
-describe('TagPatternBuilder', () => {
-    const unitUnderTest = new TagPatternBuilder()
+describe('TagFormatBuilder', () => {
+    const unitUnderTest = new TagFormatBuilder()
 
     test('without prefix', () => {
         // given
