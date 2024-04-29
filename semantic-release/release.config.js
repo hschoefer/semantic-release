@@ -19,8 +19,8 @@ module.exports = {
             }],
         "@semantic-release/changelog",
         ["@semantic-release/git", {
-            "assets": process.env.ASSETS.split(","),
-            "tag": process.env.TAG_PATTERN
+            "assets": process.env.ASSETS.split(",")
         }]
-    ]
+    ],
+    "tagFormat": process.env.TAG_PATTERN
 }
