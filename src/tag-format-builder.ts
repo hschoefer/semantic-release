@@ -1,4 +1,4 @@
-export class TagPatternBuilder {
+export class TagFormatBuilder {
   build(packageName: string): string {
     let prefix = ""
     if ("" != packageName) {

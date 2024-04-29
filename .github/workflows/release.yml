@@ -40,7 +40,6 @@ jobs:
         with:
           debug: true
           dev-version-schema: npm
-          package-name: "mypackage"
           step: prepare
 
       - name: Print version outputs

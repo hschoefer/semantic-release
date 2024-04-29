@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {Executor} from "./executor";
-import {TagPatternBuilder} from "./tag-pattern-builder";
+import {TagFormatBuilder} from "./tag-format-builder";
 import {DevVersionGenerator} from "./dev-version-generator";
 import {DayjsTimestampGenerator} from "./dayjs-timestamp-generator";
 
@@ -28,17 +28,14 @@ async function run(): Promise<void> {
     await executor.prepareSemanticReleaseWorkingDirectory(workingDirectory)
     await executor.npmInstall(workingDirectory)
 
-    core.info(`Using package name: ${packageName}`)
-
-    const tagPattern = new TagPatternBuilder().build(packageName)
-    core.info(`Using tag pattern: ${tagPattern}`)
+    const tagFormat = new TagFormatBuilder().build(packageName)
 
     if ('prepare' == step) {
       core.info("Execute prepare step.")
-      await executor.executeDryRun(workingDirectory, debugFlag, assets, tagPattern, branchName, branchNameProcessed, versionConnector)
+      await executor.executeDryRun(workingDirectory, debugFlag, assets, tagFormat, branchName, branchNameProcessed, versionConnector)
       await executor.writeOutputs(workingDirectory, defaultBranch, branchName)
     } else {
-      await executor.executeRelease(workingDirectory, debugFlag, assets, tagPattern, branchName, branchNameProcessed, versionConnector)
+      await executor.executeRelease(workingDirectory, debugFlag, assets, tagFormat, branchName, branchNameProcessed, versionConnector)
     }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */

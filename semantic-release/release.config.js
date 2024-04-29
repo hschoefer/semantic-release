@@ -22,5 +22,5 @@ module.exports = {
             "assets": process.env.ASSETS.split(",")
         }]
     ],
-    "tagFormat": process.env.TAG_PATTERN
+    "tagFormat": process.env.TAG_FORMAT
 }
