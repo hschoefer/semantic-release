@@ -38,9 +38,10 @@ jobs:
         uses: ./
         id: semantic-release
         with:
-          step: prepare
-          dev-version-schema: npm
           debug: true
+          dev-version-schema: npm
+          package-name: "mypackage"
+          step: prepare
 
       - name: Print version outputs
         shell: bash
@@ -67,5 +68,4 @@ jobs:
           assets: "CHANGELOG.md,package.json,package-lock.json,dist/**/*"
           debug: true
           dev-version-schema: npm
-          package-name: "mypackage"
           step: release
