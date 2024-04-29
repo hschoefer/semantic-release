@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/hschoefer/semantic-release/compare/v1.1.0...v1.1.1) (2024-04-29)
+
+
+### Bug Fixes
+
+* tagFormat configuration ([8ff17d6](https://github.com/hschoefer/semantic-release/commit/8ff17d642e9206ee59d3c739e071fed513e0032e))
+
 # [1.1.0](https://github.com/hschoefer/semantic-release/compare/v1.0.1...v1.1.0) (2024-04-26)
 
 
