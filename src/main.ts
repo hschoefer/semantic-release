@@ -28,7 +28,10 @@ async function run(): Promise<void> {
     await executor.prepareSemanticReleaseWorkingDirectory(workingDirectory)
     await executor.npmInstall(workingDirectory)
 
+    core.info(`Using package name: ${packageName}`)
+
     const tagPattern = new TagPatternBuilder().build(packageName)
+    core.info(`Using tag pattern: ${tagPattern}`)
 
     if ('prepare' == step) {
       core.info("Execute prepare step.")
